@@ -47,8 +47,8 @@ prueba/
 ### 2. Clonar el repositorio
 
 ```bash
-git https://github.com/Plazola11/prueba.git
-cd prueba
+git clone https://github.com/Plazola11/prueba.git
+cd gestion-usuarios
 ```
 ### 3. Levantar la aplicación
 ```bash
