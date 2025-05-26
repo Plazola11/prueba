@@ -54,3 +54,7 @@ cd prueba
 ```bash
 docker-compose up --build 
 ```
+### 4. Acceder a la aplicación en el navegador
+```bash
+http://localhost
+```
