@@ -4,23 +4,18 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    working_dir: /app
-    command: npm run dev -- --host
+      - "80:80"
     depends_on:
       - backend
 
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "3001:3001"
-    volumes:
-      - ./backend:/app
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/usuariosdb
     depends_on:

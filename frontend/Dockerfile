@@ -1,17 +1,13 @@
-FROM node:18
-
-# Crear directorio de trabajo dentro del contenedor
+# Etapa de build
+FROM node:18-alpine AS builder
 WORKDIR /app
-
-# Copiar los archivos de dependencias y luego instalar
 COPY package*.json ./
 RUN npm install
-
-# Copiar el resto del código fuente
 COPY . .
+RUN npm run build
 
-# Exponer el puerto que Vite usa por defecto
-EXPOSE 5173
-
-# Comando para levantar el servidor de desarrollo de Vite
-CMD ["npm", "run", "dev", "--", "--host"]
+# Etapa de producción: usar NGINX
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
