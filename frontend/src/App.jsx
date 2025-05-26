@@ -7,6 +7,7 @@ const API_URL = 'http://localhost:3001/usuarios';
 
 function App() {
   const [usuarios, setUsuarios] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('')
   const [edad, setEdad] = useState('')
@@ -15,24 +16,41 @@ function App() {
   const [editando, setEditando] = useState(null);
 
   useEffect(() => {
-    axios.get(API_URL).then(res => setUsuarios(res.data));
-  }, []);
+  const fetchData = async () => {
+    try {
+      const [resUsuarios, resDepartamentos] = await Promise.all([
+        axios.get(API_URL),                   // http://localhost:3001/usuarios
+        axios.get(`${API_URL}/departamentos`) // ruta directa a departamentos
+      ]);
+
+      setUsuarios(resUsuarios.data);
+      setDepartamentos(resDepartamentos.data);
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+    }
+  };
+
+  fetchData();
+}, []);
 
   const handleChange = (event) => {
     setDepartamento(event.target.value);
   };
 
   const manejarSubmit = async () => {
-    if (!nombre || !email) return;
+    if (!nombre || !apellido || !edad || !departamento || !email) return;
     if (editando !== null) {
-      await axios.put(`${API_URL}/${editando}`, { nombre, email });
+      await axios.put(`${API_URL}/${editando}`, { nombre, apellido, edad, departamento, email });
       setEditando(null);
     } else {
-      await axios.post(API_URL, { nombre, email });
+      await axios.post(API_URL, { nombre, apellido, edad, departamento, email });
     }
     const res = await axios.get(API_URL);
     setUsuarios(res.data);
     setNombre('');
+    setApellido('');
+    setEdad('');
+    setDepartamento('');
     setEmail('');
   };
 
@@ -43,7 +61,10 @@ function App() {
 
   const comenzarEdicion = (usuario) => {
     setNombre(usuario.nombre);
-    setEmail(usuario.email);
+    setApellido(usuario.apellido);
+    setEdad(usuario.edad);
+    setDepartamento(usuario.departamento_id);
+    setEmail(usuario.correo);
     setEditando(usuario.id);
   };
 
@@ -58,33 +79,20 @@ function App() {
 
       <Box sx={{ minWidth: 120, marginTop:5 }}>
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Departamento</InputLabel>
+          <InputLabel id="departamento-label">Departamento</InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
+            labelId="departamento-label"
+            id="departamento"
             value={departamento}
             label="Departamento"
             onChange={handleChange}
           >
-            <MenuItem value={10}>Desarrollo</MenuItem>
-            <MenuItem value={20}>Juridico</MenuItem>
-            <MenuItem value={30}>Finanzas</MenuItem>
-            <MenuItem value={40}>Recursos Humanos</MenuItem>
+            {departamentos.map((dep) => (
+              <MenuItem key={dep.id} value={dep.id}>{dep.nombre}</MenuItem>  
+            ))}
           </Select>
         </FormControl>
       </Box>
-      {/* <InputLabel id="demo-simple-select-label">Departamento</InputLabel>
-      <Select
-        labelId='demo-simple-select-label'
-        value={departamento}
-        label="Departamento"
-        onChange={handleChange}
-      >
-        <MenuItem value={10}>Desarrollo</MenuItem>
-        <MenuItem value={20}>Juridico</MenuItem>
-        <MenuItem value={30}>Finanzas</MenuItem>
-        <MenuItem value={30}>Recursos Humanos</MenuItem>
-      </Select> */}
       
       <TextField label="Email" fullWidth value={email} onChange={e => setEmail(e.target.value)} style={{ marginTop: 10 }} />
       <Button variant="contained" onClick={manejarSubmit} style={{ marginTop: 10 }}>
@@ -103,7 +111,7 @@ function App() {
               </>
             }
           >
-            {usuario.nombre} - {usuario.email}
+            {usuario.nombre} {usuario.apellido} - {usuario.departamento} - {usuario.correo}
           </ListItem>
         ))}
       </List>
