@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+
+# Entorno y secretos
+.env
+.env.local
+.env.*.local
+
+# Build y distribución
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache
+.cache/
+.tmp/
+temp/
+
+# Directorios del editor
+.vscode/
+.idea/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
